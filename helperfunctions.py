@@ -107,12 +107,13 @@ def makedir(screen_name):
         sys.exit(1)
 
 
-def twitter_url(screen_name, no_rt, start, end):
+def twitter_url(screen_name, no_rt, start, end, topics=[]):
     """Form url to access tweets via Twitter's search page.
 
     Params
     -------
     screen_name : str
+    topics : list of strings
     no_rt : bool
     start : datetime-onj
     end : datetime-obj
@@ -121,16 +122,21 @@ def twitter_url(screen_name, no_rt, start, end):
     -------
     {string} search url for twitter
     """
-    url1 = 'https://twitter.com/search?f=tweets&q=from%3A'
-    url2 = screen_name + '%20since%3A' + start.strftime('%Y-%m-%d') 
-    url3 = ''
-    if no_rt:
-        url3 = '%20until%3A' + end.strftime('%Y-%m-%d') + '%20&src=typd'
-    else:
-        url3 = '%20until%3A' + end.strftime('%Y-%m-%d') + \
-                '%20include%3Aretweets&src=typd'
+    # join url parts
+    union = '%20'
+    union_topic = '%20OR%20'
+    # construct the various parts of the search url
+    url = ['https://twitter.com/search?f=tweets&q=']
+    url.append( union_topic.join(topics)  )
+    url.append( 'from%3A' + screen_name )
+    url.append( 'since%3A' + start.strftime('%Y-%m-%d') )
+    url.append( 'until%3A' + end.strftime('%Y-%m-%d') )
+    if no_rt:                                                                   
+        url.append( '&src=typd' )      
+    else:                                                                       
+        url.append( 'include%3Aretweets&src=typd' )
     
-    return url1 + url2 + url3
+    return union.join( url )
 
 
 def increment_day(date, i):
@@ -149,48 +155,8 @@ def increment_day(date, i):
 
 
 # GETTTING TWEETS
-def get_user_tweets(client, screen_name, tweet_lim=3200, no_rt=True):
-    """Get tweets for a given user (3,200 limit)
-    
-    Create a subdir named 'users'.
-    In this subdir, a jsonl file will store all the tweets writen
-    by the given user.
-    
-    Params
-    -------
-    client : tweepy.api
-    screen_name : str  
-    no_rt : bool {default True}
-    tweet_lim : int {default 3,200}
-
-    returns
-    -------
-    {int} number of tweets mined
-    """
-    # Make dir structure
-    makedir(screen_name)
-
-    total_tweets = 0
-    fname = 'users/{0}/usr_timeline_{0}.jsonl'.format(screen_name)
-    with open(fname, 'a') as f:
-        for page in Cursor(client.user_timeline, screen_name=screen_name,
-                           count=200).pages(16): 
-            for tweet in page:
-                total_tweets += 1
-                if no_rt:
-                    if not tweet.retweeted and 'RT @' not in tweet.text:
-                        f.write(json.dumps(tweet._json)+'\n')
-                else:
-                    f.write(json.dumps(tweet._json)+'\n')
-
-                # break if tweet_lim has been reached
-                if total_tweets == tweet_lim:
-                    return total_tweets
-    return total_tweets
-
-
-def get_all_user_tweets(screen_name, start, end, tweet_lim=3200, no_rt=True,
-                       virtuald=False):
+def get_all_user_tweets(screen_name, start, end, topics=[], 
+                        tweet_lim=3200, no_rt=True, virtuald=False):
     """
     Params
     ------
@@ -224,7 +190,7 @@ def get_all_user_tweets(screen_name, start, end, tweet_lim=3200, no_rt=True,
         # Get Twitter search url
         startDate = increment_day(start, 0)
         endDate = increment_day(start, 1)
-        url = twitter_url(screen_name, no_rt, startDate, endDate)
+        url = twitter_url(screen_name, no_rt, startDate, endDate, topics)
 
         driver.get(url)
         time.sleep(delay)

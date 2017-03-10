@@ -5,7 +5,7 @@ from multiprocessing import Pool
 from itertools import repeat
 
 
-def search_tweets(screen_name, virtuald, tweet_lim):
+def search_tweets(screen_name, virtuald, tweet_lim, topics=[]):
     # tweepy API
     client = get_twitter_client()
     print('Getting {}\'s Tweets...'.format(screen_name))
@@ -23,7 +23,8 @@ def search_tweets(screen_name, virtuald, tweet_lim):
 
     # save tweet ids to jsonl file
     num_tweets = get_all_user_tweets(screen_name, 
-                                     start, end,
+                                     start, end, 
+                                     topics=topics,
                                      tweet_lim=tweet_lim, 
                                      virtuald=virtuald)
     total_tweets.append(num_tweets)
@@ -90,8 +91,14 @@ def write_tweets(screen_names, verbosity):
 
 
 if __name__=='__main__':
-    screen_names = ['X1alejandro3x', 'HEPfeickert']                                 
-                                                                                
+    screen_names = [
+        'X1alejandro3x', 'HEPfeickert'
+                   ]                                 
+    topics = [
+        'muslims', 'muslim', 'travel', 'ban', 'radical', 'radicals', 'islam', 
+        'terrorists', 'terrorist', 'eo', 'executive', 'order', 'resist'
+             ]
+
     # command line arguments                                                        
     args = mining_cml()                                                             
     verbosity = args.verbose                                                        
