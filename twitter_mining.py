@@ -12,6 +12,12 @@ def search_tweets(screen_names, virtuald, tweet_lim):
     print('Getting Tweets...')
     total_tweets = []
     for screen_name in screen_names:
+        # check that 'start' is after account was created
+        user_data = client.get_user('X1alejandro3x')
+        created = user_data.created_at
+        if start<created:
+            start = created
+
         # save tweet ids to jsonl file
         num_tweets = get_all_user_tweets(screen_name, 
                                          start, end,
