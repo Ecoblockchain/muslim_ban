@@ -26,56 +26,17 @@ from nltk.tokenize import TweetTokenizer
 from config import *
 
 # COMMAND LINE OPTIONS
-def gs_cml():
-    """Command line arguments for gridsearches
-
-    Options
-    -------
-    infile : str (default users/authorship.csv)
-            Contains tweets, tweet_id, user_id.
-    ngram : int (default 1)
-            n-gram. Default is `1`, an unigram .
-    jobs : int (default -1)
-            Number of CPUs to run gridsearches on.
-            Default is `-1` which uses all detected CPUs.
-
-    Returns
-    -------
-    {argparse-obj} cml arguments container.
-    """
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--infile", 
-                        help="input file (defaut: users/authorship.csv)",
-                        default="users/authorship.csv", 
-                        type=str)
-    parser.add_argument("--ngram",  
-                        help="max size for n-grams (default: 1)", 
-                        default=1,                      
-                        type=int)
-    parser.add_argument("--jobs",   
-                        help="number of CPU cores to use (default: -1).", 
-                        default=-1,                     
-                        type=int)
-    args = parser.parse_args()
-    return args
-
-
 def mining_cml():
     """Command line arguments for mining.                                  
                                                                                 
     Options                                                                      
-    --------                 
-    outfile : str (default users/authorship.csv)                                 
-                Contains tweets, tweet_id, user_id.
-    batch : str (default 'y')                                                     
-            If 'y': use twitter's API, else use selenium.                                
+    --------                
+    virtual : bool (default True)
+              Use virtual display (i.e., use on EC2 instances).
     tweets_lim : int (default -1)
             Maximum number of tweets to be mined. 
             Default `-1` will either be limited by the twitter API or by
             the range of dates provided.
-    reset : str (default 'n')
-            If 'y': skip tweet acquisition and go straight to data cleaning.
-            If 'y': batch is automatically set to False.
                                                                                 
     Returns                                                                     
     -------                                                                     
@@ -88,20 +49,10 @@ def mining_cml():
     parser.add_argument("-d", "--virtual",                                      
                         help="Use virtual display (use on EC2 instance).",                       
                         action="store_true")
-    parser.add_argument("-o", "--outfile", 
-                        help="output file (defaut: users/authorship.csv)",       
-                        default="users/authorship.csv",                         
-                        type=str)
-    parser.add_argument("-s", "--smallbatch",      
-                        help="Mine small batch of tweets using twitter's API.", 
-                        action="store_true")                                               
     parser.add_argument("-l", "--tweet_lim",  
                         help="Max number of tweets to mine (default: -1).",
                         default=-1,  
                         type=int)
-    parser.add_argument("-r", "--reset",  
-                        help="Reset connection to continue getting tweets ",    
-                        action="store_true")
     args = parser.parse_args()   
 
 
@@ -336,7 +287,7 @@ def get_all_user_tweets(screen_name, start, end, tweet_lim=3200, no_rt=True,
 ### PREPROCESSING
 stop = stopwords.words('english')
 def preprocessor(doc):
-   """Proportion of characters in document                                     
+    """Proportion of characters in document                                     
                                                                                 
     :( :) :P :p :O :3 :| :/ :\ :$ :* :@                                         
     :-( :-) :-P :-p :-O :-3 :-| :-/ :-\ :-$ :-* :-@                             

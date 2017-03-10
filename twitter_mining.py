@@ -32,8 +32,8 @@ def write_tweets(screen_names, verbosity):
         ftweet = 'users/{0}/usr_timeline_{0}.jsonl'.format(screen_name)
         fcheck = 'users/{0}/checkpoints_{0}.txt'.format(screen_name)
         if not os.path.isfile(fcheck):      # if no checkpoint file
-            with open(fid, 'r') as f_id, open(ftweet, 'a') as f_tweet, 
-            open(fcheck, 'w') as check_p:
+            with open(fid, 'r') as f_id, open(ftweet, 'a') as f_tweet, \
+                    open(fcheck, 'w') as check_p: 
 
                 for line in iter(f_id.readline, ''):
                     # save the location of file
@@ -52,8 +52,8 @@ def write_tweets(screen_names, verbosity):
                             time.sleep(60*15)
 
         else:       # if checkpoints file allready exists
-            with open(fid, 'r') as f_id, open(ftweet, 'a') as f_tweet, 
-            open(fcheck, 'r+') as check_p:  
+            with open(fid, 'r') as f_id, open(ftweet, 'a') as f_tweet, \
+                    open(fcheck, 'r+') as check_p:  
 
                 checkpoints = check_p.readlines()
                 checkpoints = [check.strip('\n') for check in checkpoints 
@@ -87,9 +87,7 @@ if __name__=='__main__':
     args = mining_cml()                                                             
     verbosity = args.verbose                                                        
     virtuald = args.virtual                                                         
-    f_authorship = args.outfile                                                     
     tweet_lim = args.tweet_lim                                                      
-    reset = args.reset  # search  write 
 
     # search for tweets 
     search_tweets(screen_names, virtuald, tweet_lim)
