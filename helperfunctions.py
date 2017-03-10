@@ -269,7 +269,6 @@ def get_all_user_tweets(screen_name, start, end, tweet_lim=3200, no_rt=True,
                             driver.close()                                                              
                             if virtuald:                                                                
                                 vdisplay.stop()
-                            print('{} tweets found.'.format(ids_total))
                             return ids_total
 
                     except StaleElementReferenceException as e:
@@ -288,7 +287,6 @@ def get_all_user_tweets(screen_name, start, end, tweet_lim=3200, no_rt=True,
     driver.close()
     if virtuald:
         vdisplay.stop()
-    print('{} tweets found.'.format(ids_total))
     return ids_total
 
 
