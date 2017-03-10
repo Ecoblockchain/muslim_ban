@@ -1,4 +1,5 @@
 from helperfunctions import *
+from multiprocessing import Process
 from tweepy import TweepError
 
 
@@ -100,3 +101,4 @@ if __name__=='__main__':
 
     # save tweets -> save entire tweet
     write_tweets(screen_names, verbosity)
+

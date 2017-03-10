@@ -259,8 +259,16 @@ def get_all_user_tweets(screen_name, start, end, tweet_lim=3200, no_rt=True,
                         ids.append(tweet_id)
                         ids_total += 1
 
-                        # break if tweet_lim has been reached                           
-                        if ids_total == tweet_lim:       
+                        # BREAK IF tweet_lim has been reached                           
+                        if ids_total == tweet_lim:      
+                            # Save ids to file
+                            data_to_write = list(set(ids))                                  
+                            fout.write(json.dumps(data_to_write)+'\n')
+
+                            # Close selenium driver                                                     
+                            driver.close()                                                              
+                            if virtuald:                                                                
+                                vdisplay.stop()
                             print('{} tweets found.'.format(ids_total))
                             return ids_total
 
