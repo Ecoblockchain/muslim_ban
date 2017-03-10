@@ -11,7 +11,7 @@ def search_tweets(screen_name, virtuald, tweet_lim, topics=[]):
     print('Getting {}\'s Tweets...'.format(screen_name))
 
     # parameters
-    start = datetime.datetime(2013, 1, 1)                                           
+    start = datetime.datetime(2015, 1, 1)                                           
     end = datetime.datetime.today()
     total_tweets = []
 
@@ -92,29 +92,42 @@ def write_tweets(screen_names, verbosity):
 
 if __name__=='__main__':
     screen_names = [
-        'X1alejandro3x', 'HEPfeickert'
+        'realDonaldTrump', 'POTUS', 'WhiteHouse', 'PressSec',
+        'RudyGiuliani', 'StephenBannon', 'jeffsessions', 'KellyannePolls',
+        'GenFlynn',
+        'NBCNews', 'CNN', 'cnnbrk', 'FoxNews', 'AP',
                    ]                                 
     topics = [
         'muslims', 'muslim', 'islam', 'islamic', 'mosque', 'mosques',
-        'radical', 'radicals', 'terrorism', 'terrorists', 'terrorist', 'ISIS', 
-        'travel', 'ban', 'eo', 'executive', 'order', 'screening', 'resist',
-        'airport', 'visa', 'visas','target', 'targets', 'refug', 'refugee', 
-        'refugees', 
+        'radical', 'radicals', 'terrorism', 'terrorists', 'terrorist', 
+        'terror', 'ISIS', 
+        'travel', 'ban', 'eo', 'executive', 'order','orders', 'screening', 
+        'resist', 'protect', 'protection',
+        'airport', 'airports', 'visa', 'visas','target', 'targets', 'refug', 
+        'refugee', 'refugees', 'middle', 'east', 'eastern', 'easterns'
         'Iran', 'Iraq', 'Libya', 'Somalia', 'Sudan', 'Yemen', 'Syria',
              ]
 
 
     # command line arguments                                                        
-    args = mining_cml()                                                             
-    verbosity = args.verbose                                                        
-    virtuald = args.virtual                                                         
-    tweet_lim = args.tweet_lim                                                      
+    args        = mining_cml()                                                             
+    verbosity   = args.verbose                                                        
+    virtuald    = args.virtual                                                         
+    tweet_lim   = args.tweet_lim                                                      
+    search      = args.search
+    multisearch = args.multisearch
+    write       = args.write
 
-    # search for tweets 
-    freeze_support()
-    pool = Pool()
-    pool.starmap(search_tweets, 
-                 zip(screen_names, repeat(virtuald), repeat(tweet_lim)))
+    # search for tweets
+    if search:
+        for screen_name in screen_names:
+            search_tweets(screen_name, virtuald, tweet_lim, topics=topics)
+    if multisearch:
+        freeze_support()
+        pool = Pool()
+        pool.starmap(search_tweets, 
+                    zip(screen_names, repeat(virtuald), repeat(tweet_lim)))
 
-    # save tweets -> save entire tweet                                          
-    write_tweets(screen_names, verbosity) 
+    # save tweets -> save entire tweet  
+    if write:
+        write_tweets(screen_names, verbosity) 

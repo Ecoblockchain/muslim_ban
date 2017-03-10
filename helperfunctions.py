@@ -53,6 +53,15 @@ def mining_cml():
                         help="Max number of tweets to mine (default: -1).",
                         default=-1,  
                         type=int)
+    parser.add_argument("-s", "--search",                                      
+                        help="Search tweets.",      
+                        action="store_true")
+    parser.add_argument("-ms", "--multisearch",
+                        help="Searh tweets with multiprocessing enabled.",      
+                        action="store_true")
+    parser.add_argument("-w", "--write",  
+                        help="write(save) tweets to file.",      
+                        action="store_true")
     args = parser.parse_args()   
 
 
