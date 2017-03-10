@@ -95,9 +95,14 @@ if __name__=='__main__':
         'X1alejandro3x', 'HEPfeickert'
                    ]                                 
     topics = [
-        'muslims', 'muslim', 'travel', 'ban', 'radical', 'radicals', 'islam', 
-        'terrorists', 'terrorist', 'eo', 'executive', 'order', 'resist'
+        'muslims', 'muslim', 'islam', 'islamic', 'mosque', 'mosques',
+        'radical', 'radicals', 'terrorism', 'terrorists', 'terrorist', 'ISIS', 
+        'travel', 'ban', 'eo', 'executive', 'order', 'screening', 'resist',
+        'airport', 'visa', 'visas','target', 'targets', 'refug', 'refugee', 
+        'refugees', 
+        'Iran', 'Iraq', 'Libya', 'Somalia', 'Sudan', 'Yemen', 'Syria',
              ]
+
 
     # command line arguments                                                        
     args = mining_cml()                                                             
