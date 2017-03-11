@@ -241,7 +241,8 @@ def get_all_user_tweets(screen_name, start, end, topics=[],
                             fout.write(json.dumps(data_to_write)+'\n')
 
                             # Close selenium driver                                                     
-                            driver.close()                                                              
+                            #driver.close()   
+                            driver.quit()
                             if virtuald:                                                                
                                 vdisplay.stop()
                             return ids_total
@@ -259,7 +260,8 @@ def get_all_user_tweets(screen_name, start, end, topics=[],
         start = increment_day(start, 1)
     
     # Close selenium driver
-    driver.close()
+    #driver.close()
+    driver.quit()
     if virtuald:
         vdisplay.stop()
     return ids_total
