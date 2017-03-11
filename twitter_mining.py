@@ -104,7 +104,7 @@ if __name__=='__main__':
         'travel', 'ban', 'eo', 'executive', 'order','orders', 'screening', 
         'resist', 'protect', 'protection',
         'airport', 'airports', 'visa', 'visas','target', 'targets', 'refug', 
-        'refugee', 'refugees', 'middle', 'east', 'eastern', 'easterns'
+        'refugee', 'refugees', 'middle', 'east', 'eastern', 'easterners'
         'Iran', 'Iraq', 'Libya', 'Somalia', 'Sudan', 'Yemen', 'Syria',
              ]
 
