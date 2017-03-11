@@ -56,5 +56,6 @@ class BlogSpider(scrapy.Spider):
             'title'     : title,
             'date'      : date,
             'text'      : text,
-            'reference' : ref,
+            'origin'    : response,
+            'citation'  : ref,
         }
