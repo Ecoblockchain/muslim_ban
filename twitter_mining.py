@@ -5,30 +5,26 @@ from multiprocessing import Pool
 from itertools import repeat
 
 
-def search_tweets(screen_name, virtuald, tweet_lim, topics=[]):
+def search_tweets(start, end, screen_name, virtuald, tweet_lim, topics=[]):
     # tweepy API
     client = get_twitter_client()
     print('Getting {}\'s Tweets...'.format(screen_name))
-
-    # parameters
-    start = datetime.datetime(2015, 1, 1)                                           
-    end = datetime.datetime.today()
-    total_tweets = []
 
     # check that 'start' is after account was created
     user_data = client.get_user(screen_name)
     created = user_data.created_at
     if start<created:
         start = created
+    if not end:                                                                 
+        end = datetime.datetime.today()
 
     # save tweet ids to jsonl file
-    num_tweets = get_all_user_tweets(screen_name, 
-                                     start, end, 
-                                     topics=topics,
-                                     tweet_lim=tweet_lim, 
-                                     virtuald=virtuald)
-    total_tweets.append(num_tweets)
-    print('Found {} tweets from {}.'.format(sum(total_tweets), screen_name))
+    total_tweets = get_all_user_tweets(screen_name, 
+                                       start, end, 
+                                       topics=topics,
+                                       tweet_lim=tweet_lim, 
+                                       virtuald=virtuald)
+    print('Found {} tweets from {}.'.format(total_tweets, screen_name))
 
 
 def write_tweets(screen_names, verbosity):
@@ -91,6 +87,10 @@ def write_tweets(screen_names, verbosity):
 
 
 if __name__=='__main__':
+    
+    start = datetime.datetime(2015, 1, 1)                                       
+    end = datetime.datetime.today()
+    
     screen_names = [
         'realDonaldTrump', 'POTUS', 'WhiteHouse', 'PressSec',
         'RudyGiuliani', 'StephenBannon', 'jeffsessions', 'KellyannePolls',
@@ -108,7 +108,6 @@ if __name__=='__main__':
         'Iran', 'Iraq', 'Libya', 'Somalia', 'Sudan', 'Yemen', 'Syria',
              ]
 
-
     # command line arguments                                                        
     args        = mining_cml()                                                             
     verbosity   = args.verbose                                                        
@@ -121,12 +120,15 @@ if __name__=='__main__':
     # search for tweets
     if search:
         for screen_name in screen_names:
-            search_tweets(screen_name, virtuald, tweet_lim, topics=topics)
+            search_tweets(start, end, screen_name, virtuald, tweet_lim,
+                          topics=topics)
     if multisearch:
         freeze_support()
         pool = Pool()
         pool.starmap(search_tweets, 
-                    zip(screen_names, repeat(virtuald), repeat(tweet_lim)))
+                    zip(repeat(start), repeat(end), screen_names, 
+                        repeat(virtuald), repeat(tweet_lim))
+                    )
 
     # save tweets -> save entire tweet  
     if write:
