@@ -6,6 +6,8 @@ import datetime
 import re
 import string
 import json
+import csv
+import pickle
 
 from tweepy import API
 from tweepy import OAuthHandler
@@ -29,12 +31,12 @@ def mining_cml():
                                                                                 
     Options                                                                      
     --------                
-    virtual     : bool (default True)
-                  Use virtual display (i.e., use on EC2 instances).
-    tweets_lim  : int (default -1)
-                  Maximum number of tweets to be mined. 
-                  Default `-1` will either be limited by the twitter API or by
-                  the range of dates provided.
+    virtual : bool (default True)
+              Use virtual display (i.e., use on EC2 instances).
+    tweets_lim : int (default -1)
+            Maximum number of tweets to be mined. 
+            Default `-1` will either be limited by the twitter API or by
+            the range of dates provided.
                                                                                 
     Returns                                                                     
     -------                                                                     
@@ -59,6 +61,9 @@ def mining_cml():
                         action="store_true")
     parser.add_argument("-w", "--write",  
                         help="write(save) tweets to file.",      
+                        action="store_true")
+    parser.add_argument("-c", "--compile_docs",
+                        help="Compile pertinent information from documents.", 
                         action="store_true")
     args = parser.parse_args()   
 
@@ -120,10 +125,10 @@ def twitter_url(screen_name, no_rt, start, end, topics=[]):
     Params
     -------
     screen_name : str
-    topics      : list of strings
-    no_rt       : bool
-    start       : datetime-onj
-    end         : datetime-obj
+    topics : list of strings
+    no_rt : bool
+    start : datetime-onj
+    end : datetime-obj
     
     Returns
     -------
@@ -152,7 +157,7 @@ def increment_day(date, i):
     Params
     -------
     date : datetime-obj
-    i    : int
+    i : int
     
     Returns
     -------
@@ -168,13 +173,11 @@ def get_all_user_tweets(screen_name, start, end, topics=[],
     Params
     ------
     screen_name : str
-    start       : datetime-obj
-    end         : datetime-obj
-    topics      : list of str (default empty)
-    tweet_lim   : int (default 3,200)
-    no_rt       : bool (default True)
-    virtuald    : bool (default False)
-
+    start : datetime-obj
+    end : datetime-obj
+    no_rt : bool
+    tweet_lim : int {default 3,200}
+    
     returns
     -------
     Writes tweets ids to users/{}/usr_tweetids_{}.jsonl
@@ -195,64 +198,69 @@ def get_all_user_tweets(screen_name, start, end, topics=[],
     driver = webdriver.Chrome() 
     
     ids_total = 0
-    for day in range(((end - start).days//2) + 1):
+    for day in range((end - start).days + 1):
         # Get Twitter search url
         startDate = increment_day(start, 0)
-        endDate = increment_day(start, 2)
+        endDate = increment_day(start, 1)
         url = twitter_url(screen_name, no_rt, startDate, endDate, topics)
 
         driver.get(url)
         time.sleep(delay)
         
-        found_tweets =driver.find_elements_by_css_selector('li.js-stream-item')
-        increment = 10
+        try:
+            found_tweets = \
+            driver.find_elements_by_css_selector('li.js-stream-item')
+            increment = 10
 
-        # Scroll through the Twitter search page
-        while len(found_tweets) >= increment:
-            # scroll down for more results
-            driver.execute_script(
-                'window.scrollTo(0, document.body.scrollHeight);'
-            )
-            time.sleep(delay)
-            # select tweets
-            found_tweets = driver.find_elements_by_css_selector(
-                'li.js-stream-item'
-            )
-            increment += 10
+            # Scroll through the Twitter search page
+            while len(found_tweets) >= increment:
+                # scroll down for more results
+                driver.execute_script(
+                    'window.scrollTo(0, document.body.scrollHeight);'
+                )
+                time.sleep(delay)
+                # select tweets
+                found_tweets = driver.find_elements_by_css_selector(
+                    'li.js-stream-item'
+                )
+                increment += 10
 
-        # Get the IDs for all Tweets
-        ids = []
-        with open(fname_tweet_ids, 'a') as fout:
-            for tweet in found_tweets:
-                try:
-                    # get tweet id
-                    tweet_id = tweet.find_element_by_css_selector(
-                        '.time a.tweet-timestamp'
-                    ).get_attribute('href').split('/')[-1]
-                    ids.append(tweet_id)
-                    ids_total += 1
+            # Get the IDs for all Tweets
+            ids = []
+            with open(fname_tweet_ids, 'a') as fout:
+                for tweet in found_tweets:
+                    try:
+                        # get tweet id
+                        tweet_id = tweet.find_element_by_css_selector(
+                            '.time a.tweet-timestamp'
+                        ).get_attribute('href').split('/')[-1]
+                        ids.append(tweet_id)
+                        ids_total += 1
 
-                    # BREAK IF tweet_lim has been reached                           
-                    if ids_total == tweet_lim:      
-                        # Save ids to file
-                        data_to_write = list(set(ids))                                  
-                        fout.write(json.dumps(data_to_write)+'\n')
+                        # BREAK IF tweet_lim has been reached                           
+                        if ids_total == tweet_lim:      
+                            # Save ids to file
+                            data_to_write = list(set(ids))                                  
+                            fout.write(json.dumps(data_to_write)+'\n')
 
-                        # Close selenium driver                                                     
-                        #driver.close()   
-                        driver.quit()
-                        if virtuald:                                                                
-                            vdisplay.stop()
-                        return ids_total
+                            # Close selenium driver                                                     
+                            #driver.close()   
+                            driver.quit()
+                            if virtuald:                                                                
+                                vdisplay.stop()
+                            return ids_total
 
-                except StaleElementReferenceException as e:
-                    print('Lost element reference.', tweet)
+                    except StaleElementReferenceException as e:
+                        print('Lost element reference.', tweet)
                         
-            # Save ids to file
-            data_to_write = list(set(ids))
-            fout.write(json.dumps(data_to_write)+'\n')
+                # Save ids to file
+                data_to_write = list(set(ids))
+                fout.write(json.dumps(data_to_write)+'\n')
         
-        start = increment_day(start, 2)
+        except NoSuchElementException:
+            print('No tweets found.')
+
+        start = increment_day(start, 1)
     
     # Close selenium driver
     #driver.close()
@@ -278,8 +286,8 @@ def preprocessor(doc):
     :smile: :hug: :pencil:                                                      
     """                                                                         
     re_url = r"(http|https):\/\/.\S+"                                           
-    re_emoji = r"(\:\w+\:|\<[\/\\]?3|[\(\)\\\D|\*\$][\-\^]?[\:\;\=]|"\
-            "[\:\;\=B8][\-\^]?[3DOPp\@\$\*\\\)\(\/\|])(?=\s|[\!\.\?]|$)"    
+    re_emoji = r"(\:\w+\:|\<[\/\\]?3|[\(\)\\\D|\*\$][\-\^]?[\:\;\=]|[\:\;\=B8][\-\^]?"\
+    "[3DOPp\@\$\*\\\)\(\/\|])(?=\s|[\!\.\?]|$)"    
     # remove urls                                                               
     doc = re.sub(re_url, "", doc)                                               
     # remove emoticons                                                          
