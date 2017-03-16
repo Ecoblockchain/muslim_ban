@@ -162,6 +162,7 @@ if __name__=='__main__':
                           tweet_lim, 
                           start=start,
                           end=end,
+                          day_step=3,
                           topics=topics)
     if multisearch:
         freeze_support()

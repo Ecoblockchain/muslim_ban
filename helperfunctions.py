@@ -167,7 +167,7 @@ def increment_day(date, i):
 
 
 # GETTTING TWEETS
-def get_all_user_tweets(screen_name, start, end, topics=[], 
+def get_all_user_tweets(screen_name, start, end, day_step=2, topics=[], 
                         tweet_lim=3200, no_rt=True, virtuald=False):
     """
     Params
@@ -216,7 +216,7 @@ def get_all_user_tweets(screen_name, start, end, topics=[],
         check_p.write( '{}\n'.format(start) )
         # Get Twitter search url
         start_date = increment_day(start, 0)
-        end_date = increment_day(start, 2)
+        end_date = increment_day(start, day_step)
         url = twitter_url(screen_name, no_rt, start_date, end_date, topics)
 
         driver.get(url)
@@ -274,7 +274,7 @@ def get_all_user_tweets(screen_name, start, end, topics=[],
         except NoSuchElementException as e:
             print(e)
 
-        start = increment_day(start, 2)
+        start = increment_day(start, day_step)
     
     check_p.close()
     # Close selenium driver
