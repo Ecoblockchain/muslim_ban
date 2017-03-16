@@ -196,7 +196,7 @@ def get_all_user_tweets(screen_name, start, end, day_step=2, topics=[],
         vdisplay.start()
     # Selenium parames
     # time to wait on each page load before reading the page
-    delay = 1  
+    delay = 1 
     driver = webdriver.Chrome() 
     
     ids_total = 0
@@ -220,9 +220,9 @@ def get_all_user_tweets(screen_name, start, end, day_step=2, topics=[],
         url = twitter_url(screen_name, no_rt, start_date, end_date, topics)
 
         driver.get(url)
-        time.sleep(delay)
        
         try:
+            time.sleep(delay)
             found_tweets = \
             driver.find_elements_by_css_selector('li.js-stream-item')
             increment = 10
@@ -259,7 +259,7 @@ def get_all_user_tweets(screen_name, start, end, day_step=2, topics=[],
                             fout.write(json.dumps(data_to_write)+'\n')
 
                             # Close selenium driver                                                     
-                            driver.close()   
+                            driver.quit()   
                             if virtuald:                                                                
                                 vdisplay.stop()
                             return ids_total
@@ -272,13 +272,14 @@ def get_all_user_tweets(screen_name, start, end, day_step=2, topics=[],
                 fout.write(json.dumps(data_to_write)+'\n')
         
         except NoSuchElementException as e:
-            print(e)
+            time.sleep(10*60)
+            continue
 
         start = increment_day(start, day_step)
     
     check_p.close()
     # Close selenium driver
-    driver.close()
+    driver.quit()
     if virtuald:
         vdisplay.stop()
     return ids_total
