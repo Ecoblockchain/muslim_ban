@@ -58,25 +58,25 @@ def write_tweets(screen_names, verbosity):
             checkpoints = [check.strip('\n') for check in checkpoints
                            if check.strip('\n')!='']
 
-            with open(fid, 'r') as f_id, open(ftweet, 'a') as f_tweet: 
-                if not os.path.isfile(fcheck):
-                    f_id.seek(int(checkpoints[-1]))
+        with open(fid, 'r') as f_id, open(ftweet, 'a') as f_tweet: 
+            if not os.path.isfile(fcheck):
+                f_id.seek(int(checkpoints[-1]))
 
-                for line in iter(f_id.readline, ''):
-                    # save the location of file
-                    check_p.write( '{}\n'.format(f_id.tell()) )
-                    # load ids
-                    ids = json.loads(line)
+            for line in iter(f_id.readline, ''):
+                # save the location of file
+                check_p.write( '{}\n'.format(f_id.tell()) )
+                # load ids
+                ids = json.loads(line)
                     
-                    for tweetId in ids:
-                        try:
-                            tweet = client.get_status(tweetId)
-                            f_tweet.write(json.dumps(tweet._json)+'\n')
+                for tweetId in ids:
+                    try:
+                        tweet = client.get_status(tweetId)
+                        f_tweet.write(json.dumps(tweet._json)+'\n')
 
-                        except TweepError as e:
-                            if verbosity:
-                                print(e)
-                            time.sleep(60*15)
+                    except TweepError as e:
+                        if verbosity:
+                            print(e)
+                        time.sleep(60*15)
         check_p.close()
         print('done writing results.\nCheck: {}'.format(ftweet))
 
