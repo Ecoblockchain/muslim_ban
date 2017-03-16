@@ -15,6 +15,7 @@ def search_tweets(screen_name,
                   tweet_lim,
                   start=datetime.datetime(2015, 1, 1), 
                   end=datetime.datetime.today(), 
+                  day_step=2,
                   topics=[]):
     # tweepy API
     client = get_twitter_client()
@@ -30,6 +31,7 @@ def search_tweets(screen_name,
     total_tweets = []
     num_tweets = get_all_user_tweets(screen_name, 
                                      start, end, 
+                                     day_step=day_step,
                                      topics=topics,
                                      tweet_lim=tweet_lim, 
                                      virtuald=virtuald)
