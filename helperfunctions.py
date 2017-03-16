@@ -209,6 +209,7 @@ def get_all_user_tweets(screen_name, start, end, topics=[],
                        if check.strip('\n')!='']
         # go to last checkpoint                                         
         start = datetime.datetime.strptime(checkpoints[-1],"%Y-%m-%d %H:%M:%S")
+        print('Resuming from: {}\n'.format(start))
 
     while start<=end:
         # save checkpoint
