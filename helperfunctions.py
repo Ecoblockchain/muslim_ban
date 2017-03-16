@@ -188,7 +188,8 @@ def get_all_user_tweets(screen_name, start, end, topics=[],
 
     # name of file for saving tweet ids
     fname_tweet_ids = 'users/{0}/usr_tweetids_{0}.jsonl'.format(screen_name)
-   
+    fcheck = 'users/{0}/search_checkpoints_{0}.txt'.format(screen_name)
+
     # Headless displays with Xvfb (X virtual framebuffer)
     if virtuald:
         vdisplay = Xvfb()
@@ -199,7 +200,19 @@ def get_all_user_tweets(screen_name, start, end, topics=[],
     driver = webdriver.Chrome() 
     
     ids_total = 0
-    for day in range(((end - start).days)//2 + 1):
+    if not os.path.isfile(fcheck):      # if no checkpoint file             
+        check_p = open(fcheck, 'w')                                         
+    else:                                                                   
+        check_p = open(fcheck, 'r+')                                        
+        checkpoints = check_p.readlines()                                   
+        checkpoints = [check.strip('\n') for check in checkpoints 
+                       if check.strip('\n')!='']
+        # go to last checkpoint                                         
+        start = datetime.datetime.strptime(checkpoints[-1],"%Y-%m-%d %H:%M:%S")
+
+    while start<=end:
+        # save checkpoint
+        check_p.write( '{}\n'.format(start) )
         # Get Twitter search url
         start_date = increment_day(start, 0)
         end_date = increment_day(start, 2)
@@ -259,6 +272,7 @@ def get_all_user_tweets(screen_name, start, end, topics=[],
 
         start = increment_day(start, 2)
     
+    check_p.close()
     # Close selenium driver
     driver.close()
     if virtuald:

@@ -48,9 +48,19 @@ def write_tweets(screen_names, verbosity):
         fid = 'users/{0}/usr_tweetids_{0}.jsonl'.format(screen_name)
         ftweet = 'users/{0}/usr_timeline_{0}.jsonl'.format(screen_name)
         fcheck = 'users/{0}/checkpoints_{0}.txt'.format(screen_name)
-        if not os.path.isfile(fcheck):      # if no checkpoint file
-            with open(fid, 'r') as f_id, open(ftweet, 'a') as f_tweet, \
-                    open(fcheck, 'w') as check_p: 
+        
+        # if no checkpoint file
+        if not os.path.isfile(fcheck):
+            check_p = open(fcheck, 'w')
+        else:
+            check_p = open(fcheck, 'r+')
+            checkpoints = check_p.readlines()
+            checkpoints = [check.strip('\n') for check in checkpoints
+                           if check.strip('\n')!='']
+
+            with open(fid, 'r') as f_id, open(ftweet, 'a') as f_tweet: 
+                if not os.path.isfile(fcheck):
+                    f_id.seek(int(checkpoints[-1]))
 
                 for line in iter(f_id.readline, ''):
                     # save the location of file
@@ -67,33 +77,7 @@ def write_tweets(screen_names, verbosity):
                             if verbosity:
                                 print(e)
                             time.sleep(60*15)
-
-        else:       # if checkpoints file allready exists
-            with open(fid, 'r') as f_id, open(ftweet, 'a') as f_tweet, \
-                    open(fcheck, 'r+') as check_p:  
-
-                checkpoints = check_p.readlines()
-                checkpoints = [check.strip('\n') for check in checkpoints 
-                               if check.strip('\n')!='']
-                # go to last checkpoint
-                if checkpoints:
-                    f_id.seek(int(checkpoints[-1]))
-                for line in iter(f_id.readline, ''):                                              
-                    # save the location of file
-                    check_p.write( '{}\n'.format(f_id.tell()) )
-                    # load ids
-                    ids = json.loads(line)                                  
-                    
-                    for tweetId in ids:                                     
-                        try:                                                
-                            tweet = client.get_status(tweetId)  
-                            f_tweet.write(json.dumps(tweet._json)+'\n')
-
-                        except TweepError as e:                             
-                            if verbosity:
-                                print(e)                                        
-                            time.sleep(60*15)
-
+        check_p.close()
         print('done writing results.\nCheck: {}'.format(ftweet))
 
 
@@ -138,7 +122,7 @@ def compile_tweets(all_tweets):
 
 if __name__=='__main__':
     
-    start   = datetime.datetime(2017, 3, 13)                       
+    start   = datetime.datetime(2017, 1, 1)                       
     end     = datetime.datetime.today()
 
     screen_names = [
