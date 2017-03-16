@@ -221,55 +221,58 @@ def get_all_user_tweets(screen_name, start, end, topics=[],
 
         driver.get(url)
         time.sleep(delay)
-        
-        found_tweets = \
-        driver.find_elements_by_css_selector('li.js-stream-item')
-        increment = 10
+       
+        try:
+            found_tweets = \
+            driver.find_elements_by_css_selector('li.js-stream-item')
+            increment = 10
 
-        # Scroll through the Twitter search page
-        while len(found_tweets) >= increment:
-            # scroll down for more results
-            driver.execute_script(
-                'window.scrollTo(0, document.body.scrollHeight);'
-            )
-            time.sleep(delay)
-            # select tweets
-            found_tweets = driver.find_elements_by_css_selector(
-                'li.js-stream-item'
-            )
-            increment += 10
+            # Scroll through the Twitter search page
+            while len(found_tweets) >= increment:
+                # scroll down for more results
+                driver.execute_script(
+                    'window.scrollTo(0, document.body.scrollHeight);'
+                )
+                time.sleep(delay)
+                # select tweets
+                found_tweets = driver.find_elements_by_css_selector(
+                    'li.js-stream-item'
+                )
+                increment += 10
 
-        # Get the IDs for all Tweets
-        ids = []
-        with open(fname_tweet_ids, 'a') as fout:
-            for tweet in found_tweets:
-                try:
-                    # get tweet id
-                    tweet_id = tweet.find_element_by_css_selector(
-                        '.time a.tweet-timestamp'
-                    ).get_attribute('href').split('/')[-1]
-                    ids.append(tweet_id)
-                    ids_total += 1
+            # Get the IDs for all Tweets
+            ids = []
+            with open(fname_tweet_ids, 'a') as fout:
+                for tweet in found_tweets:
+                    try:
+                        # get tweet id
+                        tweet_id = tweet.find_element_by_css_selector(
+                            '.time a.tweet-timestamp'
+                        ).get_attribute('href').split('/')[-1]
+                        ids.append(tweet_id)
+                        ids_total += 1
 
-                    # BREAK IF tweet_lim has been reached                           
-                    if ids_total == tweet_lim:      
-                        # Save ids to file
-                        data_to_write = list(set(ids))                                  
-                        fout.write(json.dumps(data_to_write)+'\n')
+                        # BREAK IF tweet_lim has been reached                           
+                        if ids_total == tweet_lim:      
+                            # Save ids to file
+                            data_to_write = list(set(ids))                                  
+                            fout.write(json.dumps(data_to_write)+'\n')
 
-                        # Close selenium driver                                                     
-                        driver.close()   
-                        if virtuald:                                                                
-                            vdisplay.stop()
-                        return ids_total
+                            # Close selenium driver                                                     
+                            driver.close()   
+                            if virtuald:                                                                
+                                vdisplay.stop()
+                            return ids_total
 
-                except StaleElementReferenceException as e:
-                    print('Lost element reference.', tweet)
+                    except StaleElementReferenceException as e:
+                        print('Lost element reference.', tweet)
                         
-            # Save ids to file
-            data_to_write = list(set(ids))
-            fout.write(json.dumps(data_to_write)+'\n')
+                # Save ids to file
+                data_to_write = list(set(ids))
+                fout.write(json.dumps(data_to_write)+'\n')
         
+        except NoSuchElementException as e:
+            print(e)
 
         start = increment_day(start, 2)
     

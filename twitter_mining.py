@@ -122,15 +122,15 @@ def compile_tweets(all_tweets):
 
 if __name__=='__main__':
     
-    start   = datetime.datetime(2017, 1, 1)                       
+    start   = datetime.datetime(2015, 1, 1)                       
     end     = datetime.datetime.today()
 
     screen_names = [
         'realDonaldTrump', 'POTUS', 'WhiteHouse', 'PressSec',
         'RudyGiuliani', 'StephenBannon', 'jeffsessions', 'KellyannePolls',
         'GenFlynn',
-        'NBCNews', 'CNN', 'cnnbrk', 'FoxNews', 'AP', 'nytimes', 
-        'BreitbartNews', 'guardian',
+        #'NBCNews', 'CNN', 'cnnbrk', 'FoxNews', 'AP', 'nytimes', 
+        #'BreitbartNews', 'guardian',
                    ]                                 
     topics = [
         'muslims', 'muslim', 'islam', 'islamic', 'mosque', 'mosques',
