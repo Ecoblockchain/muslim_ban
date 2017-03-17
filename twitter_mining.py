@@ -16,7 +16,8 @@ def search_tweets(screen_name,
                   start=datetime.datetime(2015, 1, 1), 
                   end=datetime.datetime.today(), 
                   day_step=2,
-                  topics=[]):
+                  topics=[], 
+                  merge=True):
     # tweepy API
     client = get_twitter_client()
     print('Getting {}\'s Tweets...'.format(screen_name))
@@ -26,7 +27,7 @@ def search_tweets(screen_name,
     created = user_data.created_at
     if start<created:
         start = created
-
+    
     # save tweet ids to jsonl file
     total_tweets = []
     num_tweets = get_all_user_tweets(screen_name, 
@@ -34,6 +35,7 @@ def search_tweets(screen_name,
                                      day_step=day_step,
                                      topics=topics,
                                      tweet_lim=tweet_lim, 
+                                     merge=merge,
                                      virtuald=virtuald)
     total_tweets.append(num_tweets)
     print('Found {} tweets from {}.'.format(sum(total_tweets), screen_name))
@@ -150,7 +152,8 @@ if __name__=='__main__':
     args         = mining_cml()                                                             
     verbosity    = args.verbose                                                        
     virtuald     = args.virtual                                                         
-    tweet_lim    = args.tweet_lim                                                      
+    tweet_lim    = args.tweet_lim 
+    merge        = args.merge
     search       = args.search
     multisearch  = args.multisearch
     write        = args.write
@@ -165,7 +168,8 @@ if __name__=='__main__':
                           start=start,
                           end=end,
                           day_step=3,
-                          topics=topics)
+                          topics=topics, 
+                          merge=merge)
     if multisearch:
         freeze_support()
         pool = Pool()
@@ -175,7 +179,8 @@ if __name__=='__main__':
                         repeat(tweet_lim), 
                         repeat(start=start), 
                         repeat(end=end),
-                        repeat(topics=topics)))
+                        repeat(topics=topics), 
+                        repeat(merge=merge)))
 
     # save tweets -> save entire tweet  
     if write:

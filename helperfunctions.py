@@ -16,6 +16,7 @@ from tweepy import Cursor
 from xvfbwrapper import Xvfb
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.common.exceptions import NoSuchElementException 
 from selenium.common.exceptions import StaleElementReferenceException
 
@@ -31,13 +32,31 @@ def mining_cml():
                                                                                 
     Options                                                                      
     --------                
-    virtual : bool (default True)
-              Use virtual display (i.e., use on EC2 instances).
+    virtual : bool (optional, default True)
+            Use virtual display (i.e., use on EC2 instances).
+
     tweets_lim : int (default -1)
             Maximum number of tweets to be mined. 
             Default `-1` will either be limited by the twitter API or by
             the range of dates provided.
-                                                                                
+    
+    merge : bool (optional, default True)
+            Merge the results of different searches.
+    
+    search : bool (optional, default True)
+            Search for tweets.
+    
+    multisearch : bool (optional, default True)
+            Perform multiple searches in parallel.
+    
+    write : bool (optional, default True)
+            Get the entire tweet obtained from a previous search.
+    
+    compile_docs : bool (optional, default True)
+            Compile all obtained tweets into a dataset - assumes a directory
+            structure in which there is a dir `users` containing a subdir for
+            each user in the search..
+
     Returns                                                                     
     -------                                                                     
     {argparse-obj} cml arguments container.                                     
@@ -53,6 +72,9 @@ def mining_cml():
                         help="Max number of tweets to mine (default: -1).",
                         default=-1,  
                         type=int)
+    parser.add_argument("-m", "--merge",                                       
+                        help="Merge different searches.",                                  
+                        action="store_true")
     parser.add_argument("-s", "--search",                                      
                         help="Search tweets.",      
                         action="store_true")
@@ -167,17 +189,24 @@ def increment_day(date, i):
 
 
 # GETTTING TWEETS
-def get_all_user_tweets(screen_name, start, end, day_step=2, topics=[], 
-                        tweet_lim=3200, no_rt=True, virtuald=False):
+def get_all_user_tweets(screen_name, 
+                        start, end, day_step=2, 
+                        topics=[], tweet_lim=3200, no_rt=True, merge=True,
+                        virtuald=False):
     """
     Params
     ------
     screen_name : str
-    start : datetime-obj
-    end : datetime-obj
-    no_rt : bool
-    tweet_lim : int {default 3,200}
+    start       : datetime object
+    end         : datetime object
+    day_step    : int (default 2)
+    topics      : list (default [])
+    tweet_lim   : int (default 3,200)
+    no_rt       : bool (default True)
+    merge       : bool (default True)
+    virtuald    : bool (default False)
     
+
     returns
     -------
     Writes tweets ids to users/{}/usr_tweetids_{}.jsonl
@@ -197,10 +226,10 @@ def get_all_user_tweets(screen_name, start, end, day_step=2, topics=[],
     # Selenium parames
     # time to wait on each page load before reading the page
     delay = 1 
-    driver = webdriver.Chrome() 
-    
-    ids_total = 0
-    if not os.path.isfile(fcheck):      # if no checkpoint file             
+    driver = webdriver.Firefox() #Chrome() 
+
+
+    if not os.path.isfile(fcheck) or merge:           
         check_p = open(fcheck, 'w')                                         
     else:                                                                   
         check_p = open(fcheck, 'r+')                                        
@@ -211,6 +240,7 @@ def get_all_user_tweets(screen_name, start, end, day_step=2, topics=[],
         start = datetime.datetime.strptime(checkpoints[-1],"%Y-%m-%d %H:%M:%S")
         print('Resuming from: {}\n'.format(start))
 
+    ids_total = 0
     while start<=end:
         # save checkpoint
         check_p.write( '{}\n'.format(start) )
@@ -220,13 +250,13 @@ def get_all_user_tweets(screen_name, start, end, day_step=2, topics=[],
         url = twitter_url(screen_name, no_rt, start_date, end_date, topics)
 
         driver.get(url)
-       
+        driver.implicitly_wait(delay)
+
         try:
-            time.sleep(delay)
             found_tweets = \
             driver.find_elements_by_css_selector('li.js-stream-item')
             increment = 10
-
+            
             # Scroll through the Twitter search page
             while len(found_tweets) >= increment:
                 # scroll down for more results
@@ -268,8 +298,9 @@ def get_all_user_tweets(screen_name, start, end, day_step=2, topics=[],
                         print('Lost element reference.', tweet)
                         
                 # Save ids to file
-                data_to_write = list(set(ids))
-                fout.write(json.dumps(data_to_write)+'\n')
+                if ids:
+                    data_to_write = list(set(ids))
+                    fout.write(json.dumps(data_to_write)+'\n')
         
         except NoSuchElementException as e:
             time.sleep(10*60)
@@ -301,8 +332,8 @@ def preprocessor(doc):
     :smile: :hug: :pencil:                                                      
     """                                                                         
     re_url = r"(http|https):\/\/.\S+"                                           
-    re_emoji = r"(\:\w+\:|\<[\/\\]?3|[\(\)\\\D|\*\$][\-\^]?[\:\;\=]|[\:\;\=B8][\-\^]?"\
-    "[3DOPp\@\$\*\\\)\(\/\|])(?=\s|[\!\.\?]|$)"    
+    re_emoji = r"(\:\w+\:|\<[\/\\]?3|[\(\)\\\D|\*\$][\-\^]?[\:\;\=]|"\
+            "[\:\;\=B8][\-\^]?[3DOPp\@\$\*\\\)\(\/\|])(?=\s|[\!\.\?]|$)"    
     # remove urls                                                               
     doc = re.sub(re_url, "", doc)                                               
     # remove emoticons                                                          
