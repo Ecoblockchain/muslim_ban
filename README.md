@@ -22,6 +22,11 @@ The process can be divided in three different tasks:
 For further clean up check
 [search_tweets](https://github.com/alejandrox1/muslim_ban/blob/master/search_tweets.ipynb).
 
+## White House Press
+[whpress](https://github.com/alejandrox1/muslim_ban/blob/master/whpress/whpress/spiders/blog.py)
+is a `scrapy spider` that can be used to scrape all the press briefings from
+the white house. 
+
 # SET UP
 To search obtain tweets we use a `Python Selenium`.
 In order to get `Selenium` working you will need to install `chromedriver` for
