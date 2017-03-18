@@ -16,8 +16,7 @@ def search_tweets(screen_name,
                   start=datetime.datetime(2015, 1, 1), 
                   end=datetime.datetime.today(), 
                   day_step=2,
-                  topics=[], 
-                  merge=True):
+                  topics=[]):
     # tweepy API
     client = get_twitter_client()
     print('Getting {}\'s Tweets...'.format(screen_name))
@@ -35,7 +34,6 @@ def search_tweets(screen_name,
                                      day_step=day_step,
                                      topics=topics,
                                      tweet_lim=tweet_lim, 
-                                     merge=merge,
                                      virtuald=virtuald)
     total_tweets.append(num_tweets)
     print('Found {} tweets from {}.'.format(sum(total_tweets), screen_name))
@@ -153,7 +151,6 @@ if __name__=='__main__':
     verbosity    = args.verbose                                                        
     virtuald     = args.virtual                                                         
     tweet_lim    = args.tweet_lim 
-    merge        = args.merge
     search       = args.search
     multisearch  = args.multisearch
     write        = args.write
@@ -168,8 +165,7 @@ if __name__=='__main__':
                           start=start,
                           end=end,
                           day_step=3,
-                          topics=topics, 
-                          merge=merge)
+                          topics=topics)
     if multisearch:
         freeze_support()
         pool = Pool()
@@ -179,8 +175,7 @@ if __name__=='__main__':
                         repeat(tweet_lim), 
                         repeat(start=start), 
                         repeat(end=end),
-                        repeat(topics=topics), 
-                        repeat(merge=merge)))
+                        repeat(topics=topics)))
 
     # save tweets -> save entire tweet  
     if write:

@@ -40,9 +40,6 @@ def mining_cml():
             Default `-1` will either be limited by the twitter API or by
             the range of dates provided.
     
-    merge : bool (optional, default True)
-            Merge the results of different searches.
-    
     search : bool (optional, default True)
             Search for tweets.
     
@@ -72,9 +69,6 @@ def mining_cml():
                         help="Max number of tweets to mine (default: -1).",
                         default=-1,  
                         type=int)
-    parser.add_argument("-m", "--merge",                                       
-                        help="Merge different searches.",                                  
-                        action="store_true")
     parser.add_argument("-s", "--search",                                      
                         help="Search tweets.",      
                         action="store_true")
@@ -191,7 +185,7 @@ def increment_day(date, i):
 # GETTTING TWEETS
 def get_all_user_tweets(screen_name, 
                         start, end, day_step=2, 
-                        topics=[], tweet_lim=3200, no_rt=True, merge=True,
+                        topics=[], tweet_lim=3200, no_rt=True,
                         virtuald=False):
     """
     Params
@@ -203,7 +197,6 @@ def get_all_user_tweets(screen_name,
     topics      : list (default [])
     tweet_lim   : int (default 3,200)
     no_rt       : bool (default True)
-    merge       : bool (default True)
     virtuald    : bool (default False)
     
 
@@ -229,7 +222,7 @@ def get_all_user_tweets(screen_name,
     driver = webdriver.Firefox() #Chrome() 
 
 
-    if not os.path.isfile(fcheck) or merge:           
+    if not os.path.isfile(fcheck):           
         check_p = open(fcheck, 'w')                                         
     else:                                                                   
         check_p = open(fcheck, 'r+')                                        
