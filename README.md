@@ -11,11 +11,11 @@ The workflow we use for this work is described in
 [twitter_mining](https://github.com/alejandrox1/muslim_ban/blob/master/twitter_mining.py).
 
 The process can be divided in three different tasks:
-* Search for tweets (`python twitter_mining.py -s`) </br>
+* Search for tweets `(python twitter_mining.py -s)` </br>
   Use `Selenium` to search tweets via Twitter's search option.
-* Writing/saving tweets (`python twitter_mining.py -w`) </br>
+* Writing/saving tweets `(python twitter_mining.py -w)` </br>
   Use `tweepy` to look up tweets by ID and save them to a file.
-* Compiling tweets (`python twitter_mining.py -c`) </br>
+* Compiling tweets `(python twitter_mining.py -c)` </br>
   Compile all tweets into a `csv` file.
   In the future this dataset will be made available.
 
