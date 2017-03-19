@@ -2,7 +2,7 @@ import csv
 import json
 import pandas as pd
 
-from helperfunctions import *
+from mining_functions import *
 from tweepy import TweepError
 from multiprocessing import freeze_support
 from multiprocessing import Pool
@@ -13,6 +13,7 @@ from itertools import repeat
 def search_tweets(screen_name, 
                   virtuald, 
                   tweet_lim,
+                  no_rt=True,
                   start=datetime.datetime(2015, 1, 1), 
                   end=datetime.datetime.today(), 
                   day_step=2,
@@ -33,7 +34,8 @@ def search_tweets(screen_name,
                                      start, end, 
                                      day_step=day_step,
                                      topics=topics,
-                                     tweet_lim=tweet_lim, 
+                                     tweet_lim=tweet_lim,
+                                     no_rt=no_rt,
                                      virtuald=virtuald)
     total_tweets.append(num_tweets)
     print('Found {} tweets from {}.'.format(sum(total_tweets), screen_name))
@@ -155,13 +157,15 @@ if __name__=='__main__':
     multisearch  = args.multisearch
     write        = args.write
     compile_docs = args.compile_docs
+    no_rt        = False                # include RTs
 
     # search for tweets
     if search:
         for screen_name in screen_names:
             search_tweets(screen_name, 
                           virtuald, 
-                          tweet_lim, 
+                          tweet_lim,
+                          no_rt=no_rt,
                           start=start,
                           end=end,
                           day_step=3,
@@ -173,6 +177,7 @@ if __name__=='__main__':
                     zip(screen_names, 
                         repeat(virtuald), 
                         repeat(tweet_lim), 
+                        repeat(no_rt=no_rt),
                         repeat(start=start), 
                         repeat(end=end),
                         repeat(topics=topics)))

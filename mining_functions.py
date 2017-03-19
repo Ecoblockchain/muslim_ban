@@ -19,6 +19,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.common.exceptions import NoSuchElementException 
 from selenium.common.exceptions import StaleElementReferenceException
+from selenium.common.exceptions import TimeoutException
 
 from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
@@ -242,10 +243,10 @@ def get_all_user_tweets(screen_name,
         end_date = increment_day(start, day_step)
         url = twitter_url(screen_name, no_rt, start_date, end_date, topics)
 
-        driver.get(url)
-        driver.implicitly_wait(delay)
-
         try:
+            driver.get(url)
+            driver.implicitly_wait(delay)
+
             found_tweets = \
             driver.find_elements_by_css_selector('li.js-stream-item')
             increment = 10
@@ -294,9 +295,12 @@ def get_all_user_tweets(screen_name,
                     fout.write(json.dumps(data_to_write)+'\n')
         
         except NoSuchElementException as e:
-            time.sleep(10*60)
+            time.sleep(1*60)
             continue
 
+        except TimeoutException:
+            driver.implicitly_wait(1*60)
+            continue
         start = increment_day(start, day_step)
     
     check_p.close()
