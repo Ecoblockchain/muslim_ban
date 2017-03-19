@@ -269,9 +269,7 @@ def get_all_user_tweets(screen_name,
                 for tweet in found_tweets:
                     try:
                         # get tweet id
-                        tweet_id = tweet.find_element_by_css_selector(
-                            '.time a.tweet-timestamp'
-                        ).get_attribute('href').split('/')[-1]
+                        tweet_id = tweet.get_attribute('data-item-id') 
                         ids.append(tweet_id)
                         ids_total += 1
 
