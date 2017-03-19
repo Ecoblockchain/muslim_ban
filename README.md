@@ -4,13 +4,14 @@ associates, surrogates, and others, to prove discriminatory intent.
 (Including statements made during the campaign and earlier.)
 
 # USE                                                                           
-One can use [get_all_user_tweets](https://github.com/alejandrox1/muslim_ban/blob/master/helperfunctions.py#L186)
+One can use [get_all_user_tweets](https://github.com/alejandrox1/muslim_ban/blob/master/mining_functions.py#L186)
 In order to go around the `Twitter API` limit of 3,200 tweets.
 
 The workflow we use for this work is described in
 [twitter_mining](https://github.com/alejandrox1/muslim_ban/blob/master/twitter_mining.py).
 
-The process can be divided in three different tasks:
+The process can be divided in three different tasks `(python twitter_mining.py -h)`:
+
 * Search for tweets `(python twitter_mining.py -s)` </br>
   Use `Selenium` to search tweets via Twitter's search option.
 * Writing/saving tweets `(python twitter_mining.py -w)` </br>
