@@ -86,7 +86,7 @@ def write_tweets(screen_names, verbosity):
 
 
 
-def compile_tweets(all_tweets):
+def compile_tweets(all_tweets, screen_names):
     print('Compiling results...') 
     with open(all_tweets, 'w') as fout:
         writer = csv.writer(fout)                                                   
@@ -188,4 +188,4 @@ if __name__=='__main__':
 
     # compile pertinent info from tweets
     if compile_docs:
-        compile_tweets('users/all_tweets.csv')
+        compile_tweets('users/all_tweets.csv', screen_names)
