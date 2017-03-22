@@ -52,7 +52,9 @@ def write_tweets(screen_names, verbosity):
         fid = 'users/{0}/usr_tweetids_{0}.jsonl'.format(screen_name)
         ftweet = 'users/{0}/usr_timeline_{0}.jsonl'.format(screen_name)
         fcheck = 'users/{0}/checkpoints_{0}.txt'.format(screen_name)
-        
+        print('Getting {}\'s Tweets...'.format(screen_name))
+        total = 0
+
         # if no checkpoint file
         if not os.path.isfile(fcheck):
             check_p = open(fcheck, 'w')
@@ -63,7 +65,7 @@ def write_tweets(screen_names, verbosity):
                            if check.strip('\n')!='']
 
         with open(fid, 'r') as f_id, open(ftweet, 'a') as f_tweet: 
-            if not os.path.isfile(fcheck):
+            if os.path.isfile(fcheck) and checkpoints:
                 f_id.seek(int(checkpoints[-1]))
 
             for line in iter(f_id.readline, ''):
@@ -76,13 +78,14 @@ def write_tweets(screen_names, verbosity):
                     try:
                         tweet = client.get_status(tweetId)
                         f_tweet.write(json.dumps(tweet._json)+'\n')
-
+                        total +=1
                     except TweepError as e:
                         if verbosity:
                             print(e)
                         time.sleep(60*15)
         check_p.close()
-        print('done writing results.\nCheck: {}'.format(ftweet))
+        print('done writing results.\nFound {} Tweets.\nCheck: {}'.format(
+            total, ftweet))
 
 
 
