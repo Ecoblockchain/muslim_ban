@@ -58,6 +58,7 @@ def write_tweets(screen_names, verbosity):
         # if no checkpoint file
         if not os.path.isfile(fcheck):
             check_p = open(fcheck, 'w')
+            checkpoints = []
         else:
             check_p = open(fcheck, 'r+')
             checkpoints = check_p.readlines()
@@ -133,9 +134,10 @@ if __name__=='__main__':
     end     = datetime.datetime.today()
 
     screen_names = [
-        'realDonaldTrump', 'POTUS', 'WhiteHouse', 'PressSec',
-        'RudyGiuliani', 'StephenBannon', 'jeffsessions', 'KellyannePolls',
-        'GenFlynn',
+        #'realDonaldTrump', 'POTUS', 'WhiteHouse', 'PressSec',
+        #'RudyGiuliani', 'StephenBannon', 'jeffsessions', 'KellyannePolls',
+        #'GenFlynn',
+        'USAGSessions',
         #'NBCNews', 'CNN', 'cnnbrk', 'FoxNews', 'AP', 'nytimes', 
         #'BreitbartNews', 'guardian',
                    ]                                 
