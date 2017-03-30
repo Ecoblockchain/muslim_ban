@@ -90,15 +90,16 @@ def write_tweets(screen_names, verbosity):
 
 
 
-def compile_tweets(all_tweets, screen_names):
+def compile_tweets(subdir, screen_names):
     print('Compiling results...') 
+    all_tweets = subdir + '/all_tweets.csv'
     with open(all_tweets, 'w') as fout:
         writer = csv.writer(fout)                                                   
         # Header                                      
         writer.writerow(['user', 'datetime','text','id', 'entities'])
         
         for screen_name in screen_names:
-            ftweet = 'users/{0}/usr_timeline_{0}.jsonl'.format(screen_name)
+            ftweet = subdir + '/{0}/usr_timeline_{0}.jsonl'.format(screen_name)
             with open(ftweet, 'r') as fin:
                 for line in fin:
                     # reading
@@ -134,24 +135,25 @@ if __name__=='__main__':
     end     = datetime.datetime.today()
 
     screen_names = [
-        #'realDonaldTrump', 'POTUS', 'WhiteHouse', 'PressSec',
-        #'RudyGiuliani', 'StephenBannon', 'jeffsessions', 'KellyannePolls',
-        #'GenFlynn',
+        'realDonaldTrump', 'POTUS', 'WhiteHouse', 'PressSec',
+        'RudyGiuliani', 'StephenBannon', 'jeffsessions', 'KellyannePolls',
+        'GenFlynn',
         'USAGSessions',
-        #'NBCNews', 'CNN', 'cnnbrk', 'FoxNews', 'AP', 'nytimes', 
-        #'BreitbartNews', 'guardian',
+        'KrisKobach1787', 'KansasSOS', 'SebGorka', 'FAIRImmigration',
+        'NBCNews', 'CNN', 'cnnbrk', 'FoxNews', 'AP', 'nytimes', 
+        'BreitbartNews', 'guardian',
                    ]                                 
     topics = [
         'muslims', 'muslim', 'islam', 'islamic', 'mosque', 'mosques',
         'radical', 'radicals', 'terrorism', 'terrorists', 'terrorist', 
         'terror', 'ISIS', 
-        'travel', 'ban', 'eo', 'executive', 'order','orders', 'screening', 
+        'travel', 'ban', 'executive', 'order','orders', 'screening', 
         'resist', 'protect', 'protection',
         'airport', 'airports', 'visa', 'visas','target', 'targets',  
         'refugee', 'refugees', 'middle', 'east', 'eastern', 'easterners'
         'Iran', 'Iraq', 'Libya', 'Somalia', 'Sudan', 'Yemen', 'Syria',
              ]
-    topics = []
+    #topics = []
 
     # command line arguments                                                        
     args         = mining_cml()                                                             
@@ -193,4 +195,4 @@ if __name__=='__main__':
 
     # compile pertinent info from tweets
     if compile_docs:
-        compile_tweets('users/all_tweets.csv', screen_names)
+        compile_tweets('users', screen_names)
