@@ -195,4 +195,4 @@ if __name__=='__main__':
 
     # compile pertinent info from tweets
     if compile_docs:
-        compile_tweets('users', screen_names)
+        compile_tweets('tweets', screen_names)
